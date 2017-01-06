@@ -25,8 +25,8 @@ type DownStreams
 -- VIEW
 
 
-jobView : Job -> Html msg
-jobView job =
+view : Job -> Html msg
+view job =
     table [ class "job-table" ]
         [ tbody []
             [ tr []

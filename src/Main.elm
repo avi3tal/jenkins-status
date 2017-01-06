@@ -6,8 +6,8 @@ import Html.Events exposing (onClick)
 import Http exposing (Error)
 import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Decode.Pipeline exposing (decode, required)
-import JenkinsBuild exposing (Build, buildListView, buildsDecoder)
-import JenkinsJob exposing (DownStreams, Job, jobDecoder, jobView)
+import JenkinsBuild exposing (Build, buildsDecoder)
+import JenkinsJob exposing (DownStreams, Job, jobDecoder)
 
 
 -- MODEL
@@ -100,7 +100,7 @@ view model =
     div [ id "main-app" ]
         [ h1 [] [ text "Jenkins Status" ]
         , h3 [] [ text "Builds" ]
-        , Html.map BuildMsg (buildListView model.builds model.selectedBuild)
+        , Html.map BuildMsg (JenkinsBuild.listView model.builds model.selectedBuild)
         , buildInfoView model.buildInfo
         ]
 
@@ -110,7 +110,7 @@ buildInfoView buildInfoMaybe =
     case buildInfoMaybe of
         Just buildInfo ->
             div [ class "job-info-container" ]
-                (List.map jobView buildInfo.jobs)
+                (List.map JenkinsJob.view buildInfo.jobs)
 
         Nothing ->
             text ""

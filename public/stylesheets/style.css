@@ -5,7 +5,8 @@ li.selected {
   font-weight: 600; }
 
 ul.build-list {
-  list-style-type: none; }
+  list-style-type: none;
+  padding: 0; }
   ul.build-list li {
     margin-bottom: 3px; }
     ul.build-list li a {
@@ -18,5 +19,14 @@ ul.build-list {
   ul.build-list li.selected a {
     color: #fff;
     background-color: #00B7FF; }
+
+table.job-table {
+  border-collapse: collapse;
+  margin-bottom: 10px; }
+  table.job-table th, table.job-table td {
+    border: 1px solid gray;
+    padding: 2px 5px; }
+  table.job-table th {
+    text-align: right; }
 
 /*# sourceMappingURL=style.css.map */

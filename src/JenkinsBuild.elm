@@ -22,14 +22,14 @@ type Msg
 -- VIEW
 
 
-buildListView : List Build -> Maybe Build -> Html Msg
-buildListView builds selectedBuild =
+listView : List Build -> Maybe Build -> Html Msg
+listView builds selectedBuild =
     ul [ class "build-list" ]
-        (List.map (buildItemView selectedBuild) builds)
+        (List.map (itemView selectedBuild) builds)
 
 
-buildItemView : Maybe Build -> Build -> Html Msg
-buildItemView selectedBuild build =
+itemView : Maybe Build -> Build -> Html Msg
+itemView selectedBuild build =
     li
         [ classList [ ( "selected", Just build == selectedBuild ) ] ]
         [ a [ onClick (SelectBuild build) ]
