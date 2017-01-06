@@ -13,9 +13,9 @@ function setupElmBuild(src, dist) {
 		console.log('path', path);
 
 		//elm-make src/Main.elm --output public/javascripts/app.js
-		execFile('elm-make', [src, '--output', dist], (error, stdout, stderr) => {
+		execFile('./node_modules/elm/Elm-Platform/0.18.0/.cabal-sandbox/bin/elm-make', [src, '--output', dist], (error, stdout, stderr) => {
 			if (error) {
-				throw error;
+				console.log(error);
 			}
 			console.log(stdout);
 		});
