@@ -23,7 +23,7 @@ router.get('/', function(req, res, next) {
 
 router.get('/:id', function(req, res, next) {
 	let j = {
-		displayName: "master-1111",
+		displayName: req.params.id,
 		jobs: [
 			{
 				name: "Build",

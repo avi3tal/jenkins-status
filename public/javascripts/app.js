@@ -9109,45 +9109,165 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
-var _user$project$Main$buildUrl = './builds';
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
-			case 'NoOp':
-				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-			case 'SelectBuild':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
+var _user$project$Main$buildsUrl = './builds';
+var _user$project$Main$jobView = function (job) {
+	return A2(
+		_elm_lang$html$Html$table,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('job-table'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$tbody,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$tr,
+						{ctor: '[]'},
 						{
-							selectedBuild: _elm_lang$core$Maybe$Just(_p0._0)
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$th,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Name'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$td,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(job.name),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
 						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			default:
-				if (_p0._0.ctor === 'Ok') {
-					var _p1 = _p0._0._0;
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$tr,
+							{ctor: '[]'},
 							{
-								builds: _p1,
-								selectedBuild: _elm_lang$core$List$head(_p1)
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$th,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Color'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$td,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(job.color),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
 							}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					var _p2 = A2(_elm_lang$core$Debug$log, 'Opps!', _p0._0._0);
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-				}
-		}
-	});
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$tr,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$th,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Started On'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$td,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(
+													_elm_lang$core$Basics$toString(job.timestamp)),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$tr,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$th,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('Down Stream Jobs #'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$td,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text(
+														_elm_lang$core$Basics$toString(
+															function () {
+																var _p0 = job.downstream;
+																return _elm_lang$core$List$length(_p0._0);
+															}())),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Main$buildInfoView = function (buildInfoMaybe) {
+	var _p1 = buildInfoMaybe;
+	if (_p1.ctor === 'Just') {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('job-info-container'),
+				_1: {ctor: '[]'}
+			},
+			A2(_elm_lang$core$List$map, _user$project$Main$jobView, _p1._0.jobs));
+	} else {
+		return _elm_lang$html$Html$text('');
+	}
+};
 var _user$project$Main$model = {
 	builds: {ctor: '[]'},
-	selectedBuild: _elm_lang$core$Maybe$Nothing
+	selectedBuild: _elm_lang$core$Maybe$Nothing,
+	buildInfo: _elm_lang$core$Maybe$Nothing
 };
 var _user$project$Main$Build = function (a) {
 	return {name: a};
@@ -9158,9 +9278,131 @@ var _user$project$Main$buildDecoder = A3(
 	_elm_lang$core$Json_Decode$string,
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$Build));
 var _user$project$Main$buildsDecoder = _elm_lang$core$Json_Decode$list(_user$project$Main$buildDecoder);
-var _user$project$Main$Model = F2(
+var _user$project$Main$Job = F5(
+	function (a, b, c, d, e) {
+		return {name: a, color: b, timestamp: c, downstream: d, building: e};
+	});
+var _user$project$Main$BuildInfo = F2(
 	function (a, b) {
-		return {builds: a, selectedBuild: b};
+		return {displayName: a, jobs: b};
+	});
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {builds: a, selectedBuild: b, buildInfo: c};
+	});
+var _user$project$Main$DownStreams = function (a) {
+	return {ctor: 'DownStreams', _0: a};
+};
+var _user$project$Main$downStreamDecoder = A2(
+	_elm_lang$core$Json_Decode$map,
+	_user$project$Main$DownStreams,
+	_elm_lang$core$Json_Decode$list(
+		_elm_lang$core$Json_Decode$lazy(
+			function (_p2) {
+				return _user$project$Main$jobDecoder;
+			})));
+var _user$project$Main$jobDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'building',
+	_elm_lang$core$Json_Decode$bool,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'downstream',
+		_user$project$Main$downStreamDecoder,
+		A3(
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+			'timestamp',
+			_elm_lang$core$Json_Decode$int,
+			A3(
+				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+				'color',
+				_elm_lang$core$Json_Decode$string,
+				A3(
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+					'name',
+					_elm_lang$core$Json_Decode$string,
+					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$Job))))));
+var _user$project$Main$buildInfoDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'jobs',
+	_elm_lang$core$Json_Decode$list(_user$project$Main$jobDecoder),
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'displayName',
+		_elm_lang$core$Json_Decode$string,
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$BuildInfo)));
+var _user$project$Main$LoadedBuildInfo = function (a) {
+	return {ctor: 'LoadedBuildInfo', _0: a};
+};
+var _user$project$Main$getBuildInfo = function (build) {
+	return A2(
+		_elm_lang$http$Http$send,
+		_user$project$Main$LoadedBuildInfo,
+		A2(
+			_elm_lang$http$Http$get,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_user$project$Main$buildsUrl,
+				A2(_elm_lang$core$Basics_ops['++'], '/', build.name)),
+			_user$project$Main$buildInfoDecoder));
+};
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
+			case 'NoOp':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'SelectBuild':
+				var _p4 = _p3._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							selectedBuild: _elm_lang$core$Maybe$Just(_p4),
+							buildInfo: _elm_lang$core$Maybe$Nothing
+						}),
+					_1: _user$project$Main$getBuildInfo(_p4)
+				};
+			case 'LoadedBuilds':
+				if (_p3._0.ctor === 'Ok') {
+					var _p6 = _p3._0._0;
+					var firstBuildMaybe = _elm_lang$core$List$head(_p6);
+					var cmd = function () {
+						var _p5 = firstBuildMaybe;
+						if (_p5.ctor === 'Just') {
+							return _user$project$Main$getBuildInfo(_p5._0);
+						} else {
+							return _elm_lang$core$Platform_Cmd$none;
+						}
+					}();
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{builds: _p6, selectedBuild: firstBuildMaybe}),
+						_1: cmd
+					};
+				} else {
+					var _p7 = A2(_elm_lang$core$Debug$log, 'Oops!', _p3._0._0);
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+			default:
+				if (_p3._0.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								buildInfo: _elm_lang$core$Maybe$Just(_p3._0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					var _p8 = A2(_elm_lang$core$Debug$log, 'Oops!', _p3._0._0);
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+		}
 	});
 var _user$project$Main$SelectBuild = function (a) {
 	return {ctor: 'SelectBuild', _0: a};
@@ -9232,7 +9474,7 @@ var _user$project$Main$view = function (model) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Jenkins Status'),
+					_0: _elm_lang$html$Html$text('Jenkins Status!'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -9248,7 +9490,11 @@ var _user$project$Main$view = function (model) {
 				_1: {
 					ctor: '::',
 					_0: A2(_user$project$Main$buildListView, model.builds, model.selectedBuild),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _user$project$Main$buildInfoView(model.buildInfo),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
@@ -9259,13 +9505,13 @@ var _user$project$Main$LoadedBuilds = function (a) {
 var _user$project$Main$getBuilds = A2(
 	_elm_lang$http$Http$send,
 	_user$project$Main$LoadedBuilds,
-	A2(_elm_lang$http$Http$get, _user$project$Main$buildUrl, _user$project$Main$buildsDecoder));
+	A2(_elm_lang$http$Http$get, _user$project$Main$buildsUrl, _user$project$Main$buildsDecoder));
 var _user$project$Main$main = _elm_lang$html$Html$program(
 	{
 		init: {ctor: '_Tuple2', _0: _user$project$Main$model, _1: _user$project$Main$getBuilds},
 		view: _user$project$Main$view,
 		update: _user$project$Main$update,
-		subscriptions: function (_p3) {
+		subscriptions: function (_p9) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
