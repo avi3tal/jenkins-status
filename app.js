@@ -9,7 +9,7 @@ const elmBuild = require('./elmBuild');
 const index = require('./routes/index');
 const builds = require('./routes/builds');
 
-elmBuild('./src/Main.elm', 'public/javascripts/app.js');
+elmBuild('./src/**/*.elm', './src/Main.elm', 'public/javascripts/app.js');
 
 const app = express();
 
