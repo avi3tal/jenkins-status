@@ -1,25 +1,28 @@
-var express = require('express');
-var router = express.Router();
-var jenkins = require('jenkins')({ baseUrl: 'http://admin:!Q@W3e4r@192.168.200.137:8080', crumbIssuer: true });
+const express = require('express');
+const router = express.Router();
+const jenkins = require('jenkins')({ baseUrl: 'http://admin:!Q@W3e4r@192.168.200.137:8080', crumbIssuer: true });
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
-	jenkins.job.get("Build", (err, data) => {
-		if (err) throw err;
 
-		var b = [
-			{name: "master-1111"},
-			{name: "RC-3333"},
-			{name: "master-2222"},
-			{name: "master-4444"}
-		];
+	let b = [
+		{name: "master-1111"},
+		{name: "RC-3333"},
+		{name: "master-2222"},
+		{name: "master-4444"}
+	];
 
-		res.send(b);
-	});
+	res.send(b);
+
+	// jenkins.job.get("Build", (err, data) => {
+	// 	if (err) throw err;
+	//
+	// 	res.send(data);
+	// });
 });
 
 router.get('/:id', function(req, res, next) {
-	var j = {
+	let j = {
 		displayName: "master-1111",
 		jobs: [
 			{
@@ -151,12 +154,13 @@ router.get('/:id', function(req, res, next) {
 			}
 		]
 	};
+	res.send(j);
 
-	jenkins.job.get("Build", (err, data) => {
-		if (err) throw err;
-
-		res.send(j);
-	});
+	// jenkins.job.get("Build", (err, data) => {
+	// 	if (err) throw err;
+	//
+	// 	res.send(data);
+	// });
 });
 
 module.exports = router;
