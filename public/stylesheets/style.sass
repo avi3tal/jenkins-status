@@ -1,6 +1,28 @@
-body
-  padding: 50px
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
+$nice-blue: #00B7FF
 
-a
-  color: #00B7FF
+body
+  font: 14px "Arial", Helvetica, sans-serif
+
+li.selected
+	font-weight: 600
+
+ul.build-list
+	list-style-type: none
+
+	li
+		margin-bottom: 3px
+
+		a
+			color: $nice-blue
+			cursor: pointer
+			display: inline-block
+			width: 150px
+			padding: 3px 7px
+			border: 1px solid $nice-blue
+
+	li.selected
+		a
+			color: #fff
+			background-color: $nice-blue
+
+
