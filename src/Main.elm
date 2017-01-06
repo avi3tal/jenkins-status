@@ -6,26 +6,11 @@ import Html.Events exposing (onClick)
 import Http exposing (Error)
 import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Decode.Pipeline exposing (decode, required)
+import JenkinsBuild exposing (Build, buildListView, buildsDecoder)
+import JenkinsJob exposing (DownStreams, Job, jobDecoder, jobView)
 
 
 -- MODEL
-
-
-type alias Build =
-    { name : String }
-
-
-type alias Job =
-    { name : String
-    , color : String
-    , timestamp : Int
-    , downstream : DownStreams
-    , building : Bool
-    }
-
-
-type DownStreams
-    = DownStreams (List Job)
 
 
 type alias BuildInfo =
@@ -56,8 +41,8 @@ model =
 type Msg
     = NoOp
     | LoadedBuilds (Result Http.Error (List Build))
-    | SelectBuild Build
     | LoadedBuildInfo (Result Http.Error BuildInfo)
+    | BuildMsg JenkinsBuild.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -66,28 +51,27 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        SelectBuild build ->
-            ( { model
-                | selectedBuild = Just build
-                , buildInfo = Nothing
-              }
-            , getBuildInfo build
-            )
+        BuildMsg buildMsg ->
+            case buildMsg of
+                JenkinsBuild.SelectBuild build ->
+                    ( { model
+                        | selectedBuild = Just build
+                        , buildInfo = Nothing
+                      }
+                    , getBuildInfo build
+                    )
 
         LoadedBuilds (Ok builds) ->
             let
-                firstBuildMaybe =
+                firstBuild =
                     List.head builds
 
                 cmd =
-                    case firstBuildMaybe of
-                        Just firstBuild ->
-                            getBuildInfo firstBuild
-
-                        Nothing ->
-                            Cmd.none
+                    firstBuild
+                        |> Maybe.map getBuildInfo
+                        |> Maybe.withDefault Cmd.none
             in
-                ( { model | builds = builds, selectedBuild = firstBuildMaybe }, cmd )
+                ( { model | builds = builds, selectedBuild = firstBuild }, cmd )
 
         LoadedBuilds (Err error) ->
             let
@@ -114,25 +98,10 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div [ id "main-app" ]
-        [ h1 [] [ text "Jenkins Status!" ]
+        [ h1 [] [ text "Jenkins Status" ]
         , h3 [] [ text "Builds" ]
-        , buildListView model.builds model.selectedBuild
+        , Html.map BuildMsg (buildListView model.builds model.selectedBuild)
         , buildInfoView model.buildInfo
-        ]
-
-
-buildListView : List Build -> Maybe Build -> Html Msg
-buildListView builds selectedBuild =
-    ul [ class "build-list" ]
-        (List.map (buildItemView selectedBuild) builds)
-
-
-buildItemView : Maybe Build -> Build -> Html Msg
-buildItemView selectedBuild build =
-    li
-        [ classList [ ( "selected", Just build == selectedBuild ) ] ]
-        [ a [ onClick (SelectBuild build) ]
-            [ text build.name ]
         ]
 
 
@@ -147,49 +116,8 @@ buildInfoView buildInfoMaybe =
             text ""
 
 
-jobView : Job -> Html Msg
-jobView job =
-    table [ class "job-table" ]
-        [ tbody []
-            [ tr []
-                [ th [] [ text "Name" ]
-                , td [] [ text job.name ]
-                ]
-            , tr []
-                [ th [] [ text "Color" ]
-                , td [] [ text job.color ]
-                ]
-            , tr []
-                [ th [] [ text "Started On" ]
-                , td [] [ text <| toString job.timestamp ]
-                ]
-            , tr []
-                [ th [] [ text "Down Stream Jobs #" ]
-                , td []
-                    [ text <|
-                        toString <|
-                            case job.downstream of
-                                DownStreams jobs ->
-                                    List.length jobs
-                    ]
-                ]
-            ]
-        ]
-
-
 
 -- DECODERS
-
-
-buildDecoder : Decoder Build
-buildDecoder =
-    decode Build
-        |> required "name" Decode.string
-
-
-buildsDecoder : Decoder (List Build)
-buildsDecoder =
-    Decode.list buildDecoder
 
 
 buildInfoDecoder : Decoder BuildInfo
@@ -197,21 +125,6 @@ buildInfoDecoder =
     decode BuildInfo
         |> required "displayName" Decode.string
         |> required "jobs" (Decode.list jobDecoder)
-
-
-downStreamDecoder : Decoder DownStreams
-downStreamDecoder =
-    Decode.map DownStreams (Decode.list (Decode.lazy (\_ -> jobDecoder)))
-
-
-jobDecoder : Decoder Job
-jobDecoder =
-    decode Job
-        |> required "name" Decode.string
-        |> required "color" Decode.string
-        |> required "timestamp" Decode.int
-        |> required "downstream" downStreamDecoder
-        |> required "building" Decode.bool
 
 
 
