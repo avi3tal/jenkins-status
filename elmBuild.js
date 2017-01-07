@@ -3,7 +3,7 @@ const chokidar = require('chokidar');
 
 function runElmMake(mainFile, dist) {
 	execFile(
-		'./node_modules/elm/Elm-Platform/0.18.0/.cabal-sandbox/bin/elm-make',
+		'elm-make',
 		[mainFile, '--output', dist], (error, stdout, stderr) => {
 		if (error) {
 			console.log(error);
