@@ -2,8 +2,8 @@ module JenkinsJob exposing (..)
 
 -- MODEL
 
-import Html exposing (Html, table, tbody, td, text, th, tr)
-import Html.Attributes exposing (class)
+import Html exposing (Html, div, table, tbody, td, text, th, tr)
+import Html.Attributes exposing (class, style)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 
@@ -35,24 +35,34 @@ view job =
                 ]
             , tr []
                 [ th [] [ text "Color" ]
-                , td [] [ text job.color ]
+                , td []
+                    [ colorIndicator job.color ]
                 ]
             , tr []
                 [ th [] [ text "Started On" ]
                 , td [] [ text <| toString job.timestamp ]
                 ]
             , tr []
-                [ th [] [ text "Down Stream Jobs #" ]
-                , td []
-                    [ text <|
-                        toString <|
-                            case job.downstream of
-                                DownStreams jobs ->
-                                    List.length jobs
-                    ]
+                [ th [] [ text "Down Stream Jobs" ]
+                , td [] (downStreamsView job.downstream)
                 ]
             ]
         ]
+
+
+downStreamsView : DownStreams -> List (Html msg)
+downStreamsView downStreams =
+    case downStreams of
+        DownStreams jobs ->
+            if List.length jobs > 0 then
+                List.map view jobs
+            else
+                [ text "-" ]
+
+
+colorIndicator : String -> Html msg
+colorIndicator color =
+    div [ class <| "color-indicator " ++ color ] []
 
 
 
