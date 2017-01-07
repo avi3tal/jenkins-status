@@ -1,24 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const jenkins = require('jenkins')({ baseUrl: 'http://admin:!Q@W3e4r@192.168.200.137:8080', crumbIssuer: true });
+const config  = require("../config.json");
+const jenkins = require('jenkins')({ baseUrl: config.baseUrl, crumbIssuer: true});
+
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
 
-	let b = [
-		{name: "master-1111"},
-		{name: "RC-3333"},
-		{name: "master-2222"},
-		{name: "master-4444"}
-	];
+	// TODO remove if condition
+	// allow working only with real environments
+	// or using External Mocker
+	if(!config.realEnv)
+		res.send([
+			{name: "master-1111"},
+			{name: "RC-3333"},
+			{name: "master-2222"},
+			{name: "master-4444"}
+		]);
+	else
+		jenkins.job.get("Build", {depth: 1, tree: "builds[displayName]"}, (err, data) => {
+			if (err) next(err);
 
-	res.send(b);
-
-	// jenkins.job.get("Build", (err, data) => {
-	// 	if (err) throw err;
-	//
-	// 	res.send(data);
-	// });
+			res.send(data.builds.map(k => {
+				return {name: k.displayName}
+			}));
+		});
 });
 
 router.get('/:id', function(req, res, next) {

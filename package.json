@@ -6,6 +6,7 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "async": "^2.1.4",
     "body-parser": "~1.15.2",
     "chokidar": "^1.6.1",
     "cookie-parser": "~1.4.3",
@@ -15,6 +16,7 @@
     "jade": "~1.11.0",
     "jenkins": "^0.20.0",
     "morgan": "~1.7.0",
+    "node-sass": "^4.1.1",
     "node-sass-middleware": "0.9.8",
     "serve-favicon": "~2.3.0"
   }
