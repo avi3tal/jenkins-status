@@ -68,7 +68,7 @@ formatDownStreamTitle downStreams =
 
 formatDate : Date -> String
 formatDate date =
-    Date.toUtcFormattedString "MMM dd, yyyy HH:mm:ss X" date
+    Date.toUtcFormattedString "yyyy-MM-dd HH:mm:ss X" date
 
 
 downStreamsView : DownStreams -> List (Html msg)
