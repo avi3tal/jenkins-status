@@ -1,6 +1,18 @@
 const execFile = require('child_process').execFile;
 const chokidar = require('chokidar');
 
+function runElmMake(mainFile, dist) {
+	execFile(
+		'./node_modules/elm/Elm-Platform/0.18.0/.cabal-sandbox/bin/elm-make',
+		[mainFile, '--output', dist], (error, stdout, stderr) => {
+		if (error) {
+			console.log(error);
+		} else {
+			console.log(stdout);
+		}
+	});
+}
+
 function setupElmBuild(watchFiles, mainFile, dist) {
 	const watcher = chokidar.watch(watchFiles, {
 		ignored: /(^|[\/\\])\../,
@@ -11,13 +23,10 @@ function setupElmBuild(watchFiles, mainFile, dist) {
 		console.log('FILE CHANGED');
 		console.log('file', path);
 
-		execFile('./node_modules/elm/Elm-Platform/0.18.0/.cabal-sandbox/bin/elm-make', [mainFile, '--output', dist], (error, stdout, stderr) => {
-			if (error) {
-				console.log(error);
-			}
-			console.log(stdout);
-		});
+		runElmMake(mainFile, dist);
 	});
+
+	runElmMake(mainFile, dist);
 }
 
 module.exports = setupElmBuild;
