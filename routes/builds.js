@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const config  = require('../config.json');
-const jenkins = require("../service/jenkinsLib")
+const jenkins = require("../service/jenkinsLib");
 
 
 /* GET users listing. */
