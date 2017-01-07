@@ -14,13 +14,13 @@ type alias Job =
     { name : String
     , color : String
     , timestamp : Date
-    , downstream : DownStreams
+    , downstream : DownStream
     , building : Bool
     }
 
 
-type DownStreams
-    = DownStreams (List Job)
+type DownStream
+    = DownStream (List Job)
 
 
 
@@ -46,18 +46,18 @@ view job =
                 ]
             , tr []
                 [ th [] [ text <| formatDownStreamTitle job.downstream ]
-                , td [] (downStreamsView job.downstream)
+                , td [] (downStreamView job.downstream)
                 ]
             ]
         ]
 
 
-formatDownStreamTitle : DownStreams -> String
-formatDownStreamTitle downStreams =
+formatDownStreamTitle : DownStream -> String
+formatDownStreamTitle downStream =
     let
         suffix =
-            case downStreams of
-                DownStreams jobs ->
+            case downStream of
+                DownStream jobs ->
                     if List.length jobs == 0 then
                         ""
                     else
@@ -71,10 +71,10 @@ formatDate date =
     Date.toUtcFormattedString "yyyy-MM-dd HH:mm:ss X" date
 
 
-downStreamsView : DownStreams -> List (Html msg)
-downStreamsView downStreams =
-    case downStreams of
-        DownStreams jobs ->
+downStreamView : DownStream -> List (Html msg)
+downStreamView downStream =
+    case downStream of
+        DownStream jobs ->
             if List.length jobs > 0 then
                 List.map view jobs
             else
@@ -90,9 +90,9 @@ colorIndicator color =
 -- DECODERS
 
 
-downStreamDecoder : Decoder DownStreams
+downStreamDecoder : Decoder DownStream
 downStreamDecoder =
-    Decode.map DownStreams (Decode.list (Decode.lazy (\_ -> jobDecoder)))
+    Decode.map DownStream (Decode.list (Decode.lazy (\_ -> jobDecoder)))
 
 
 dateFromTimestampDecoder : Decoder Date

@@ -7,7 +7,7 @@ import Http exposing (Error)
 import Json.Decode as Decode exposing (Decoder, field, succeed)
 import Json.Decode.Pipeline exposing (decode, required)
 import JenkinsBuild exposing (Build, buildsDecoder)
-import JenkinsJob exposing (DownStreams, Job, jobDecoder)
+import JenkinsJob exposing (DownStream, Job, jobDecoder)
 
 
 -- MODEL
