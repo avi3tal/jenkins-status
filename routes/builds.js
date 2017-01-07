@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const config  = require("../config.json");
-const jenkins = require('jenkins')({ baseUrl: config.baseUrl, crumbIssuer: true});
+const config  = require('../config.json');
+const jenkins = require("../service/jenkinsLib")
 
 
 /* GET users listing. */
@@ -18,16 +18,14 @@ router.get('/', function(req, res, next) {
 			{name: "master-4444"}
 		]);
 	else
-		jenkins.job.get("Build", {depth: 1, tree: "builds[displayName]"}, (err, data) => {
-			if (err) next(err);
-
-			res.send(data.builds.map(k => {
-				return {name: k.displayName}
-			}));
+		jenkins.listBuilds(10, (item) => {
+			res.send(item)
 		});
 });
 
 router.get('/:id', function(req, res, next) {
+
+
 	let j = {
 		displayName: req.params.id,
 		jobs: [
