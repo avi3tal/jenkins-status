@@ -12,10 +12,10 @@ router.get('/', function(req, res, next) {
 	// or using External Mocker
 	if(!config.realEnv)
 		res.send([
-			{name: "master-1111"},
-			{name: "RC-3333"},
-			{name: "master-2222"},
-			{name: "master-4444"}
+			{name: "master-1111", number: 1111},
+			{name: "RC-3333", number: 3333},
+			{name: "master-2222", number: 2222},
+			{name: "master-4444", number: 4444}
 		]);
 	else
 		jenkins.listBuilds(10, (item) => {
@@ -24,7 +24,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/:id', function(req, res, next) {
-
+	jenkins.listJobsByBuild(req.params.id);
 
 	let j = {
 		displayName: req.params.id,
