@@ -146,7 +146,7 @@ getBuilds =
 getBuildInfo : Build -> Cmd Msg
 getBuildInfo build =
     buildInfoDecoder
-        |> Http.get (buildsUrl ++ "/" ++ build.name)
+        |> Http.get (buildsUrl ++ "/" ++ (toString build.number))
         |> Http.send LoadedBuildInfo
 
 

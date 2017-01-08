@@ -27,7 +27,8 @@ router.get('/:id', function(req, res, next) {
 	jenkins.listJobsByBuild(req.params.id);
 
 	let j = {
-		displayName: req.params.id,
+		displayName: `Build-${req.params.id}`,
+		number: req.params.id,
 		jobs: [
 			{
 				name: "Build",

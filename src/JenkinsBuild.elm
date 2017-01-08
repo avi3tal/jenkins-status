@@ -11,7 +11,9 @@ import Json.Decode.Pipeline exposing (decode, required)
 
 
 type alias Build =
-    { name : String }
+    { name : String
+    , number : Int
+    }
 
 
 type Msg
@@ -45,6 +47,7 @@ buildDecoder : Decoder Build
 buildDecoder =
     decode Build
         |> required "name" Decode.string
+        |> required "number" Decode.int
 
 
 buildsDecoder : Decoder (List Build)
