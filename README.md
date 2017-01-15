@@ -1,6 +1,8 @@
 # Jenkins-Status
 New view for jenkins...
 
+![image](https://cloud.githubusercontent.com/assets/12777196/21966459/29a58138-db7c-11e6-88ad-00205d276e99.png)
+
 ## Prerequisites
 
 ### Node
