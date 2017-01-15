@@ -1,18 +1,26 @@
 module JenkinsBuild exposing (..)
 
-import Html exposing (Html, a, li, text, ul)
+import Common exposing (dateDecoder, formatDate)
+import Date exposing (Date)
+import Date.Extra as Date
+import Html exposing (Html, a, h2, h3, li, p, span, text, ul)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
-import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode as Decode exposing (Decoder, andThen)
+import Json.Decode.Pipeline exposing (decode, required, resolve)
+import Time exposing (Time)
 
 
 -- MODEL
 
 
 type alias Build =
-    { name : String
+    { displayName : String
     , number : Int
+    , building : Bool
+    , id : String
+    , result : String
+    , timestamp : Date
     }
 
 
@@ -35,7 +43,10 @@ itemView selectedBuild build =
     li
         [ classList [ ( "selected", Just build == selectedBuild ) ] ]
         [ a [ onClick (SelectBuild build) ]
-            [ text build.name ]
+            [ h2 [] [ text build.displayName ]
+            , p [] [ text build.result ]
+            , p [] [ text <| formatDate build.timestamp ]
+            ]
         ]
 
 
@@ -46,8 +57,12 @@ itemView selectedBuild build =
 buildDecoder : Decoder Build
 buildDecoder =
     decode Build
-        |> required "name" Decode.string
+        |> required "displayName" Decode.string
         |> required "number" Decode.int
+        |> required "building" Decode.bool
+        |> required "id" Decode.string
+        |> required "result" Decode.string
+        |> required "timestamp" dateDecoder
 
 
 buildsDecoder : Decoder (List Build)

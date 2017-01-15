@@ -99,7 +99,6 @@ view : Model -> Html Msg
 view model =
     div [ id "main-app" ]
         [ h1 [] [ text "Jenkins Status" ]
-        , h3 [] [ text "Builds" ]
         , Html.map BuildMsg (JenkinsBuild.listView model.builds model.selectedBuild)
         , buildInfoView model.buildInfo
         ]

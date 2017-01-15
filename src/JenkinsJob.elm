@@ -2,8 +2,8 @@ module JenkinsJob exposing (..)
 
 -- MODEL
 
+import Common exposing (dateDecoder, formatDate)
 import Date exposing (Date)
-import Date.Extra as Date
 import Html exposing (Html, div, table, tbody, td, text, th, tr)
 import Html.Attributes exposing (class, style)
 import Json.Decode as Decode exposing (Decoder)
@@ -66,11 +66,6 @@ formatDownStreamTitle downStream =
         "Down Stream Jobs" ++ suffix
 
 
-formatDate : Date -> String
-formatDate date =
-    Date.toUtcFormattedString "yyyy-MM-dd HH:mm:ss X" date
-
-
 downStreamView : DownStream -> List (Html msg)
 downStreamView downStream =
     case downStream of
@@ -95,17 +90,11 @@ downStreamDecoder =
     Decode.map DownStream (Decode.list (Decode.lazy (\_ -> jobDecoder)))
 
 
-dateFromTimestampDecoder : Decoder Date
-dateFromTimestampDecoder =
-    Decode.map toFloat Decode.int
-        |> Decode.map Date.fromTime
-
-
 jobDecoder : Decoder Job
 jobDecoder =
     decode Job
         |> required "name" Decode.string
         |> required "color" Decode.string
-        |> required "timestamp" dateFromTimestampDecoder
+        |> required "timestamp" dateDecoder
         |> required "downstream" downStreamDecoder
         |> required "building" Decode.bool
