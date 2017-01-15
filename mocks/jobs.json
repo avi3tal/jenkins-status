@@ -1,0 +1,132 @@
+{
+	"displayName": "Build-5269",
+	"number": "5269",
+	"jobs": [
+		{
+			"name": "Build",
+			"color": "red",
+			"timestamp": 1483693575274,
+			"downstream": [],
+			"building": false
+		},
+		{
+			"name": "Smoke",
+			"color": "blue",
+			"building": false,
+			"timestamp": 1483693575274,
+			"downstream": [
+				{
+					"name": "TestFast",
+					"color": "blue",
+					"building": false,
+					"timestamp": 1483693575274,
+					"downstream": []
+				},
+				{
+					"name": "RunE2E",
+					"color": "blue",
+					"building": false,
+					"timestamp": 1483693575274,
+					"downstream": [
+						{
+							"name": "Migration-Server-Upgrade",
+							"color": "blue",
+							"building": false,
+							"timestamp": 1483693575274,
+							"downstream": []
+						},
+						{
+							"name": "testkit",
+							"color": "red",
+							"building": false,
+							"timestamp": 1483693575274,
+							"downstream": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "PostSmoke",
+			"color": "red",
+			"building": true,
+			"timestamp": 1483693575274,
+			"downstream": [
+				{
+					"name": "DployAndTest",
+					"color": "blue",
+					"building": true,
+					"timestamp": 1483693575274,
+					"downstream": []
+				},
+				{
+					"name": "RunE2E",
+					"color": "blue",
+					"building": false,
+					"timestamp": 1483693575274,
+					"downstream": [
+						{
+							"name": "BuildInstance",
+							"color": "blue",
+							"building": false,
+							"timestamp": 1483693575274,
+							"downstream": []
+						},
+						{
+							"name": "testkit",
+							"color": "red",
+							"building": false,
+							"timestamp": 1483693575274,
+							"downstream": []
+						},
+						{
+							"name": "testR",
+							"color": "blue",
+							"building": false,
+							"timestamp": 1483693575274,
+							"downstream": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Nightly",
+			"color": "red",
+			"building": false,
+			"timestamp": 1483693575274,
+			"downstream": [
+				{
+					"name": "Stress",
+					"color": "blue",
+					"building": false,
+					"timestamp": 1483693575274,
+					"downstream": [
+						{
+							"name": "RunE2E",
+							"color": "blue",
+							"building": false,
+							"timestamp": 1483693575274,
+							"downstream": [
+								{
+									"name": "BuildInstance",
+									"color": "blue",
+									"building": false,
+									"timestamp": 1483693575274,
+									"downstream": []
+								},
+								{
+									"name": "testkit",
+									"color": "red",
+									"building": false,
+									"timestamp": 1483693575274,
+									"downstream": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
