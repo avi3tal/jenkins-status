@@ -11,7 +11,6 @@
     "chokidar": "^1.6.1",
     "cookie-parser": "~1.4.3",
     "debug": "~2.2.0",
-    "elm": "^0.18.0",
     "express": "~4.14.0",
     "jade": "~1.11.0",
     "jenkins": "^0.20.0",
