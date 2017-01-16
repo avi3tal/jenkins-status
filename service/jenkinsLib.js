@@ -1,5 +1,5 @@
 const config  = require("../config.json");
-const jenkins = require('jenkins')({ baseUrl: config.baseUrl, crumbIssuer: true});
+const jenkins = require('jenkins')({ baseUrl: config.baseUrl, crumbIssuer: true, promisify: false});
 
 function handleBuilds(builds, limit) {
 	return builds
