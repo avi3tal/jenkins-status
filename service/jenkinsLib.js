@@ -71,23 +71,27 @@ function getDownstreamProjects(projectName, upstreamBuildNumber) {
 				);
 				return Promise.all(requestPromises)
 					.then(builds => {
-						console.log('---builds', builds);
 						return Promise.all(builds.map(build => {
-							console.log('---build', build);
 							if (build === undefined) { return undefined; }
 							let projectName = build.name;
 							return jenkins.build.get(projectName, build.id, {
 								tree: 'id,building,description,displayName,duration,result,timestamp,url,subBuilds[abort,jobName,result,buildNumber]'
 							})
-								.then(build => {
-									let newBuild = Object.assign({}, build, {projectName: projectName});
-									console.log('newBuild', newBuild);
-									return newBuild;
-								})
+								.then(build => Object.assign({}, build, {projectName: projectName}))
 						}))
 					});
 			})
-			.then(builds => _.compact(builds));
+			.then(builds => {
+				let buildsWithData =_.compact(builds);
+				if (buildsWithData.length > 0) {
+					return Promise.all(buildsWithData.map(buildWithData =>
+						getDownstreamProjects(buildWithData.projectName, parseInt(buildWithData.id, 10))
+					))
+						.then(nextBuilds => _.flatten(_.concat(buildsWithData, nextBuilds)));
+				} else {
+					return buildsWithData;
+				}
+			});
 	}
 }
 
