@@ -63,12 +63,10 @@ view job =
                 [ th [] [ text "Duration" ]
                 , td [] [ text <| humanizeDuration job.duration ]
                 ]
-            , tr []
-                [ th [] [ text "Sub Builds" ]
-                  --                [ th [] [ text <| formatDownStreamTitle job.subBuilds ]
-                , td [] [ text "subBuilds" ]
-                  --                , td [] (downStreamView job.subBuilds)
-                ]
+              --            , tr []
+              --                [ th [] [ text <| formatDownStreamTitle job.subBuilds ]
+              --                , td [] (downStreamView job.subBuilds)
+              --                ]
             ]
         ]
 
