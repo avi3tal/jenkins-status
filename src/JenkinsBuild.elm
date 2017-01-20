@@ -7,7 +7,7 @@ import Html exposing (Html, a, h2, h3, li, p, span, text, ul)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder, andThen)
-import Json.Decode.Pipeline exposing (decode, required, resolve)
+import Json.Decode.Pipeline exposing (decode, required, resolve, optional)
 import Time exposing (Time)
 
 
@@ -16,11 +16,15 @@ import Time exposing (Time)
 
 type alias Build =
     { displayName : String
+    , projectName : String
+    , description : String
     , number : Int
     , building : Bool
     , id : String
     , result : String
+    , duration : Time
     , timestamp : Date
+    , url : String
     }
 
 
@@ -58,11 +62,15 @@ buildDecoder : Decoder Build
 buildDecoder =
     decode Build
         |> required "displayName" Decode.string
+        |> required "projectName" Decode.string
+        |> optional "description" Decode.string ""
         |> required "number" Decode.int
         |> required "building" Decode.bool
         |> required "id" Decode.string
-        |> required "result" Decode.string
+        |> optional "result" Decode.string "UNKNOWN"
+        |> required "duration" Decode.float
         |> required "timestamp" dateDecoder
+        |> required "url" Decode.string
 
 
 buildsDecoder : Decoder (List Build)

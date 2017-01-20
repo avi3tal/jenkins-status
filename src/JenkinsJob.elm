@@ -2,20 +2,25 @@ module JenkinsJob exposing (..)
 
 -- MODEL
 
-import Common exposing (dateDecoder, formatDate)
+import Common exposing (dateDecoder, formatDate, humanizeDuration)
 import Date exposing (Date)
-import Html exposing (Html, div, table, tbody, td, text, th, tr)
-import Html.Attributes exposing (class, style)
+import Html exposing (Html, a, caption, div, table, tbody, td, text, th, tr)
+import Html.Attributes exposing (class, href, style, target)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode.Pipeline exposing (decode, optional, required)
+import Time exposing (Time)
 
 
 type alias Job =
-    { name : String
-    , color : String
-    , timestamp : Date
-    , downstream : DownStream
+    { displayName : String
+    , projectName : String
+    , description : String
     , building : Bool
+    , id : String
+    , result : String
+    , duration : Time
+    , timestamp : Date
+    , url : String
     }
 
 
@@ -30,23 +35,39 @@ type DownStream
 view : Job -> Html msg
 view job =
     table [ class "job-table" ]
-        [ tbody []
+        [ caption [] [ text job.projectName ]
+        , tbody []
             [ tr []
                 [ th [] [ text "Name" ]
-                , td [] [ text job.name ]
+                , td [] [ a [ href job.url, target "_blank" ] [ text job.displayName ] ]
                 ]
             , tr []
-                [ th [] [ text "Color" ]
+                [ th [] [ text "Description" ]
+                , td [] [ text job.description ]
+                ]
+            , tr []
+                [ th [] [ text "Building" ]
+                , td [] [ text <| toString job.building ]
+                ]
+            , tr []
+                [ th [] [ text "Result" ]
                 , td []
-                    [ colorIndicator job.color ]
+                    --                    [ colorIndicator job.color ]
+                    [ text job.result ]
                 ]
             , tr []
                 [ th [] [ text "Started On" ]
                 , td [] [ text <| formatDate job.timestamp ]
                 ]
             , tr []
-                [ th [] [ text <| formatDownStreamTitle job.downstream ]
-                , td [] (downStreamView job.downstream)
+                [ th [] [ text "Duration" ]
+                , td [] [ text <| humanizeDuration job.duration ]
+                ]
+            , tr []
+                [ th [] [ text "Sub Builds" ]
+                  --                [ th [] [ text <| formatDownStreamTitle job.subBuilds ]
+                , td [] [ text "subBuilds" ]
+                  --                , td [] (downStreamView job.subBuilds)
                 ]
             ]
         ]
@@ -93,8 +114,16 @@ downStreamDecoder =
 jobDecoder : Decoder Job
 jobDecoder =
     decode Job
-        |> required "name" Decode.string
-        |> required "color" Decode.string
-        |> required "timestamp" dateDecoder
-        |> required "downstream" downStreamDecoder
+        |> required "displayName" Decode.string
+        |> required "projectName" Decode.string
+        |> optional "description" Decode.string ""
         |> required "building" Decode.bool
+        |> required "id" Decode.string
+        |> required "result" Decode.string
+        |> required "duration" Decode.float
+        |> required "timestamp" dateDecoder
+        |> required "url" Decode.string
+
+
+
+--        |> required "subBuilds" downStreamDecoder

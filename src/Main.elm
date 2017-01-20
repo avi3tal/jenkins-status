@@ -14,15 +14,21 @@ import JenkinsJob exposing (DownStream, Job, jobDecoder)
 
 
 type alias BuildInfo =
-    { displayName : String
-    , jobs : List Job
-    }
+    List Job
+
+
+
+--    { displayName : String
+--    , jobs : List Job
+--    }
 
 
 type alias Model =
     { builds : List Build
     , selectedBuild : Maybe Build
     , buildInfo : Maybe BuildInfo
+    , errorMessage : Maybe String
+    , buildInfoLoading : Bool
     }
 
 
@@ -31,7 +37,23 @@ model =
     { builds = []
     , selectedBuild = Nothing
     , buildInfo = Nothing
+    , errorMessage = Nothing
+    , buildInfoLoading = False
     }
+
+
+buildToJob : Build -> Job
+buildToJob build =
+    Job
+        build.displayName
+        build.projectName
+        build.description
+        build.building
+        build.id
+        build.result
+        build.duration
+        build.timestamp
+        build.url
 
 
 
@@ -57,8 +79,9 @@ update msg model =
                     ( { model
                         | selectedBuild = Just build
                         , buildInfo = Nothing
+                        , buildInfoLoading = True
                       }
-                    , getBuildInfo build
+                    , getBuildDownstreamProjects build
                     )
 
         LoadedBuilds (Ok builds) ->
@@ -68,27 +91,49 @@ update msg model =
 
                 cmd =
                     firstBuild
-                        |> Maybe.map getBuildInfo
+                        |> Maybe.map getBuildDownstreamProjects
                         |> Maybe.withDefault Cmd.none
             in
-                ( { model | builds = builds, selectedBuild = firstBuild }, cmd )
+                ( { model
+                    | builds = builds
+                    , selectedBuild = firstBuild
+                    , errorMessage = Nothing
+                    , buildInfoLoading = True
+                  }
+                , cmd
+                )
 
         LoadedBuilds (Err error) ->
             let
                 _ =
                     Debug.log "Oops!" error
             in
-                ( model, Cmd.none )
+                ( { model
+                    | errorMessage = Just (toString error)
+                  }
+                , Cmd.none
+                )
 
         LoadedBuildInfo (Ok buildInfo) ->
-            ( { model | buildInfo = Just buildInfo }, Cmd.none )
+            ( { model
+                | buildInfo = Just buildInfo
+                , errorMessage = Nothing
+                , buildInfoLoading = False
+              }
+            , Cmd.none
+            )
 
         LoadedBuildInfo (Err error) ->
             let
                 _ =
                     Debug.log "Oops!" error
             in
-                ( model, Cmd.none )
+                ( { model
+                    | errorMessage = Just (toString error)
+                    , buildInfoLoading = False
+                  }
+                , Cmd.none
+                )
 
 
 
@@ -99,8 +144,29 @@ view : Model -> Html Msg
 view model =
     div [ id "main-app" ]
         [ h1 [] [ text "Jenkins Status" ]
+        , (case model.errorMessage of
+            Nothing ->
+                text ""
+
+            Just error ->
+                div [ class "error" ] [ text error ]
+          )
         , Html.map BuildMsg (JenkinsBuild.listView model.builds model.selectedBuild)
-        , buildInfoView model.buildInfo
+        , if model.buildInfoLoading then
+            text "Loading..."
+          else
+            buildInfoView
+                (Maybe.map
+                    (\buildInfo ->
+                        case model.selectedBuild of
+                            Just build ->
+                                buildToJob build :: buildInfo
+
+                            Nothing ->
+                                buildInfo
+                    )
+                    model.buildInfo
+                )
         ]
 
 
@@ -108,8 +174,12 @@ buildInfoView : Maybe BuildInfo -> Html Msg
 buildInfoView buildInfoMaybe =
     case buildInfoMaybe of
         Just buildInfo ->
-            div [ class "job-info-container" ]
-                (List.map JenkinsJob.view buildInfo.jobs)
+            if List.length buildInfo == 0 then
+                div [ class "job-info-container" ]
+                    [ text "No Builds" ]
+            else
+                div [ class "job-info-container" ]
+                    (List.map JenkinsJob.view buildInfo)
 
         Nothing ->
             text ""
@@ -121,9 +191,7 @@ buildInfoView buildInfoMaybe =
 
 buildInfoDecoder : Decoder BuildInfo
 buildInfoDecoder =
-    decode BuildInfo
-        |> required "displayName" Decode.string
-        |> required "jobs" (Decode.list jobDecoder)
+    Decode.list jobDecoder
 
 
 
@@ -142,10 +210,10 @@ getBuilds =
         |> Http.send LoadedBuilds
 
 
-getBuildInfo : Build -> Cmd Msg
-getBuildInfo build =
+getBuildDownstreamProjects : Build -> Cmd Msg
+getBuildDownstreamProjects build =
     buildInfoDecoder
-        |> Http.get (buildsUrl ++ "/" ++ (toString build.number))
+        |> Http.get (buildsUrl ++ "/downstream/" ++ build.projectName ++ "/" ++ (toString build.number))
         |> Http.send LoadedBuildInfo
 
 

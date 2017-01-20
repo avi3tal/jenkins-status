@@ -11,6 +11,7 @@ li.selected
 	font-weight: 600
 
 ul.build-list
+	display: flex
 	list-style-type: none
 	padding: 0
 	white-space: nowrap
@@ -18,7 +19,6 @@ ul.build-list
 
 	li
 		margin-bottom: 3px
-		display: inline-block
 		margin-right: 5px
 
 		a
@@ -34,9 +34,17 @@ ul.build-list
 			color: #fff
 			background-color: $nice-blue
 
+.job-info-container
+	display: flex
+
 table.job-table
 	border-collapse: collapse
 	margin-bottom: 10px
+	margin-right: 5px
+
+	caption
+		font-size: 18px
+		border: 1px solid gray
 
 	th, td
 		border: 1px solid gray
