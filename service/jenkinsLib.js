@@ -75,9 +75,15 @@ function getDownstreamProjects(projectName, upstreamBuildNumber) {
 							if (build === undefined) { return undefined; }
 							let projectName = build.name;
 							return jenkins.build.get(projectName, build.id, {
-								tree: 'id,building,description,displayName,duration,result,timestamp,url,subBuilds[abort,jobName,result,buildNumber]'
+								tree: 'id,building,description,displayName,duration,result,timestamp,url,subBuilds[abort,jobName,result,buildNumber],actions[failCount,skipCount,totalCount]'
 							})
-								.then(build => Object.assign({}, build, {projectName: projectName}))
+								.then(build => {
+									let results = _.find(build.actions, (o) => {
+										return o._class === 'hudson.tasks.junit.TestResultAction';
+									});
+									delete build.actions;
+									return Object.assign({}, build, {projectName: projectName, results: results})
+								})
 						}))
 					});
 			})
