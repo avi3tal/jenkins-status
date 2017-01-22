@@ -1,8 +1,9 @@
 const _ = require('lodash');
-const config  = require("../config.json");
+const config = require('../config');
 const jenkins = require('jenkins')({ baseUrl: config.baseUrl, crumbIssuer: true, promisify: true});
 
 const rootProjectName = config.rootProjectName;
+const isProd = config.env === 'PROD';
 
 function handleBuilds(builds, limit) {
 	return builds
@@ -17,7 +18,7 @@ function listBuilds(limit) {
 		limit = 10;
 	}
 
-	if (!config.realEnv) {
+	if (!isProd) {
 		return new Promise(function (resolve, reject) {
 			let data = require('../mocks/builds.json');
 			let builds = handleBuilds(data.builds, limit);
@@ -38,7 +39,7 @@ function getDownstreamProjects(projectName, upstreamBuildNumber) {
 		throw new Error('projectName must be defined!');
 	}
 
-	if (!config.realEnv) {
+	if (!isProd) {
 		return new Promise(function (resolve, reject) {
 			let jobs = require('../mocks/jobs.json');
 			resolve(jobs);
@@ -105,7 +106,7 @@ function listJobsByBuild(buildNumber) {
 		throw new Error('buildNumber must be defined!');
 	}
 
-	if (!config.realEnv) {
+	if (!isProd) {
 		return new Promise(function (resolve, reject) {
 			let jobs = require('../mocks/jobs.json');
 			resolve(jobs);
