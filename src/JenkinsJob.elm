@@ -117,7 +117,7 @@ jobDecoder =
         |> optional "description" Decode.string ""
         |> required "building" Decode.bool
         |> required "id" Decode.string
-        |> required "result" Decode.string
+        |> optional "result" Decode.string "UNKNOWN"
         |> required "duration" Decode.float
         |> required "timestamp" dateDecoder
         |> required "url" Decode.string
