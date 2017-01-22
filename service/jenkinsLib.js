@@ -78,11 +78,8 @@ function getDownstreamProjects(projectName, upstreamBuildNumber) {
 								tree: 'id,building,description,displayName,duration,result,timestamp,url,subBuilds[abort,jobName,result,buildNumber],actions[failCount,skipCount,totalCount]'
 							})
 								.then(build => {
-									let results = _.find(build.actions, (o) => {
-										return o._class === 'hudson.tasks.junit.TestResultAction';
-									});
-									delete build.actions;
-									return Object.assign({}, build, {projectName: projectName, results: results})
+									let results = _.find(build.actions, { '_class': 'hudson.tasks.junit.TestResultAction' });
+									return Object.assign({}, _.omit(build, 'actions'), {projectName: projectName, results: results})
 								})
 						}))
 					});
