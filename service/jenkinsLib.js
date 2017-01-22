@@ -8,7 +8,9 @@ const isProd = config.env === 'PROD';
 function handleBuilds(builds, limit) {
 	return builds
 		.filter(build =>
-			build.displayName.startsWith("RC-") || build.displayName.startsWith("master-")
+			config.buildPrefix
+				? build.displayName.startsWith(config.buildPrefix)
+				: build.displayName.startsWith("RC-") || build.displayName.startsWith("master-")
 		)
 		.slice(0, limit);
 }

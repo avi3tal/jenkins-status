@@ -8,7 +8,8 @@ const jenkinsUrl = {
 
 const defaults = {
 	env: 'DEV',
-	rootProjectName: 'Build'
+	rootProjectName: 'Build',
+	buildPrefix: undefined
 };
 
 const user = {
