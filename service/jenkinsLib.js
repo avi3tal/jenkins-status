@@ -7,17 +7,13 @@ const isProd = config.env === 'PROD';
 
 function handleBuilds(builds, limit) {
 	return builds
-		.filter(build =>
-			config.buildPrefix
-				? build.displayName.startsWith(config.buildPrefix)
-				: build.displayName.startsWith("RC-") || build.displayName.startsWith("master-")
-		)
+		.filter(build => _.some(config.buildPrefixes, prefix => build.displayName.startsWith(prefix)))
 		.slice(0, limit);
 }
 
 function listBuilds(limit) {
 	if (typeof limit === 'undefined') {
-		limit = 10;
+		limit = config.rootProjectsLimit;
 	}
 
 	if (!isProd) {

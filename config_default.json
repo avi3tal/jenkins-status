@@ -1,0 +1,6 @@
+{
+	"env": "DEV",
+	"rootProjectName": "Build",
+	"buildPrefixes": ["master-", "RC-"],
+	"rootProjectsLimit": 10
+}

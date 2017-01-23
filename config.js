@@ -1,15 +1,10 @@
 const _ = require('lodash');
-const configUser = require('./config_user');
+const configUser = require('./config_user.json');
+const configDefault = require('./config_default.json');
 
 const jenkinsUrl = {
 	domain: 'ci.sparkbeyond.com',
 	protocol: 'https'
-};
-
-const defaults = {
-	env: 'DEV',
-	rootProjectName: 'Build',
-	buildPrefix: undefined
 };
 
 const user = {
@@ -17,7 +12,7 @@ const user = {
 	env: configUser.env
 };
 
-const config = _.defaults(user, defaults);
+const config = _.defaults(user, configDefault);
 
 function getJenkinsUrl(credentials) {
 	let credentialsString = credentials
