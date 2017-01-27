@@ -4,8 +4,8 @@ module JenkinsJob exposing (..)
 
 import Common exposing (dateDecoder, formatDate, humanizeDuration)
 import Date exposing (Date)
-import Html exposing (Html, a, caption, div, p, table, tbody, td, text, th, tr)
-import Html.Attributes exposing (class, href, style, target)
+import Html exposing (Html, a, caption, div, p, span, table, tbody, td, text, th, tr)
+import Html.Attributes exposing (class, href, style, target, title)
 import Json.Decode as Decode exposing (Decoder, nullable)
 import Json.Decode.Pipeline exposing (decode, optional, required)
 import Time exposing (Time)
@@ -73,7 +73,7 @@ view job =
                 ]
             , tr []
                 [ th [] [ text "Results" ]
-                , td [] [ resultsView job.results ]
+                , td [] [ resultsView job.results job.url ]
                 ]
               --            , tr []
               --                [ th [] [ text <| formatDownStreamTitle job.subBuilds ]
@@ -83,15 +83,31 @@ view job =
         ]
 
 
-resultsView : Maybe Results -> Html msg
-resultsView maybeResults =
+resultsView : Maybe Results -> String -> Html msg
+resultsView maybeResults jobUrl =
     case maybeResults of
         Nothing ->
             text "-"
 
         Just results ->
-            p []
-                [ text <| toString results.failCount ++ "/" ++ toString results.skipCount ++ "/" ++ toString results.totalCount ]
+            a [ class "test-results-link", href <| jobUrl ++ "testReport", target "_blank" ]
+                [ testCountView "failed" results.failCount
+                , span [] [ text "/" ]
+                , testCountView "skipped" results.skipCount
+                , span [] [ text "/" ]
+                , testCountView "total" results.totalCount
+                ]
+
+
+testCountView : String -> Int -> Html msg
+testCountView className count =
+    span
+        [ class <| "test-results test-results-" ++ className, title <| toCapital className ]
+        [ text <| toString count ]
+
+
+toCapital str =
+    String.toUpper (String.left 1 str) ++ String.dropLeft 1 str
 
 
 formatDownStreamTitle : DownStream -> String

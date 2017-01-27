@@ -65,3 +65,22 @@ table.job-table
 
 	&.yellow
 		background-color: $color-yellow
+
+.test-results-link
+	text-decoration: none
+	font-weight: 600
+
+	&:hover
+		text-decoration: underline
+
+.test-results
+	padding: 0 7px
+	color: #ffffff
+	border-radius: 10px
+
+	&.test-results-failed
+		background-color: $color-red
+	&.test-results-skipped
+		background-color: $color-yellow
+	&.test-results-total
+		background-color: $nice-blue
