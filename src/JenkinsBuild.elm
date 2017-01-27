@@ -48,7 +48,6 @@ itemView selectedBuild build =
         [ classList [ ( "selected", Just build == selectedBuild ) ] ]
         [ a [ onClick (SelectBuild build) ]
             [ h2 [] [ text build.displayName ]
-            , p [] [ text build.result ]
             , p [] [ text <| formatDate build.timestamp ]
             ]
         ]

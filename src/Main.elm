@@ -54,6 +54,7 @@ buildToJob build =
         build.duration
         build.timestamp
         build.url
+        Nothing
 
 
 

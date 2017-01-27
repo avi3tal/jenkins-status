@@ -4,9 +4,9 @@ module JenkinsJob exposing (..)
 
 import Common exposing (dateDecoder, formatDate, humanizeDuration)
 import Date exposing (Date)
-import Html exposing (Html, a, caption, div, table, tbody, td, text, th, tr)
+import Html exposing (Html, a, caption, div, p, table, tbody, td, text, th, tr)
 import Html.Attributes exposing (class, href, style, target)
-import Json.Decode as Decode exposing (Decoder)
+import Json.Decode as Decode exposing (Decoder, nullable)
 import Json.Decode.Pipeline exposing (decode, optional, required)
 import Time exposing (Time)
 
@@ -21,6 +21,14 @@ type alias Job =
     , duration : Time
     , timestamp : Date
     , url : String
+    , results : Maybe Results
+    }
+
+
+type alias Results =
+    { failCount : Int
+    , skipCount : Int
+    , totalCount : Int
     }
 
 
@@ -63,12 +71,27 @@ view job =
                 [ th [] [ text "Duration" ]
                 , td [] [ text <| humanizeDuration job.duration ]
                 ]
+            , tr []
+                [ th [] [ text "Results" ]
+                , td [] [ resultsView job.results ]
+                ]
               --            , tr []
               --                [ th [] [ text <| formatDownStreamTitle job.subBuilds ]
               --                , td [] (downStreamView job.subBuilds)
               --                ]
             ]
         ]
+
+
+resultsView : Maybe Results -> Html msg
+resultsView maybeResults =
+    case maybeResults of
+        Nothing ->
+            text "-"
+
+        Just results ->
+            p []
+                [ text <| toString results.failCount ++ "/" ++ toString results.skipCount ++ "/" ++ toString results.totalCount ]
 
 
 formatDownStreamTitle : DownStream -> String
@@ -109,6 +132,14 @@ downStreamDecoder =
     Decode.map DownStream (Decode.list (Decode.lazy (\_ -> jobDecoder)))
 
 
+resultsDecoder : Decoder Results
+resultsDecoder =
+    decode Results
+        |> required "failCount" Decode.int
+        |> required "skipCount" Decode.int
+        |> required "totalCount" Decode.int
+
+
 jobDecoder : Decoder Job
 jobDecoder =
     decode Job
@@ -121,6 +152,7 @@ jobDecoder =
         |> required "duration" Decode.float
         |> required "timestamp" dateDecoder
         |> required "url" Decode.string
+        |> optional "results" (nullable resultsDecoder) Nothing
 
 
 
