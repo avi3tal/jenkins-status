@@ -17,12 +17,6 @@ type alias BuildInfo =
     List Job
 
 
-
---    { displayName : String
---    , jobs : List Job
---    }
-
-
 type alias Model =
     { builds : List Build
     , selectedBuild : Maybe Build

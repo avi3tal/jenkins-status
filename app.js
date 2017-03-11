@@ -4,12 +4,9 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const elmBuild = require('./elmBuild');
 
 const index = require('./routes/index');
 const builds = require('./routes/builds');
-
-elmBuild('./src/**/*.elm', './src/Main.elm', 'public/javascripts/app.js');
 
 const app = express();
 

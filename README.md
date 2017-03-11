@@ -17,6 +17,12 @@ Install [Elm](http://elm-lang.org/) following this [Docs](https://guide.elm-lang
     
 ## Run
 
-    node ./bin/www
+#### To compile Elm files and start Express
+
+    npm run serve
+    
+#### To watch and re-compile Elm files ans start Express
+
+    npm run serve:watch
     
 Navigate to <http://localhost:3000>
