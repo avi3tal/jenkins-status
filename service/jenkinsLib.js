@@ -11,24 +11,23 @@ function handleBuilds(builds, limit) {
 		.slice(0, limit);
 }
 
-function listBuilds(limit) {
+async function listBuilds(limit) {
 	if (typeof limit === 'undefined') {
 		limit = config.rootProjectsLimit;
 	}
 
 	if (!isProd) {
-		return new Promise(function (resolve, reject) {
-			let data = require('../mocks/builds.json');
-			let builds = handleBuilds(data.builds, limit);
-			resolve(builds);
-		});
+		let data = require('../mocks/builds.json');
+		let builds = handleBuilds(data.builds, limit);
+		return Promise.resolve(builds);
 	} else {
-		return jenkins.job.get(rootProjectName, {
+		let response = await jenkins.job.get(rootProjectName, {
 			depth: 1,
 			tree: "builds[id,displayName,description,number,building,duration,timestamp,result,url]"
-		})
-			.then((data) => handleBuilds(data.builds, limit))
-			.then(builds => builds.map(build => Object.assign({}, build, { projectName: rootProjectName })));
+		});
+		let normalizedBuilds = handleBuilds(response.builds, limit)
+			.map(build => Object.assign({}, build, { projectName: rootProjectName }));
+		return Promise.resolve(normalizedBuilds);
 	}
 }
 
@@ -38,10 +37,8 @@ function getDownstreamProjects(projectName, upstreamBuildNumber) {
 	}
 
 	if (!isProd) {
-		return new Promise(function (resolve, reject) {
-			let jobs = require('../mocks/jobs.json');
-			resolve(jobs);
-		});
+		let jobs = require('../mocks/jobs.json');
+		return Promise.resolve(jobs);
 	} else {
 		return jenkins.job.get(projectName, {
 			tree: "downstreamProjects[name]"
@@ -123,18 +120,10 @@ function listJobsByBuild(buildNumber) {
 	}
 
 	if (!isProd) {
-		return new Promise(function (resolve, reject) {
-			let jobs = require('../mocks/jobs.json');
-			resolve(jobs);
-		});
+		let jobs = require('../mocks/jobs.json');
+		return Promise.resolve(jobs);
 	} else {
 		return getDownstreamProjects(rootProjectName, buildNumber);
-			// .catch(err => console.log('getDownstreamProjects error', err));
-
-		// return jenkins.build.get("Build", buildNumber, {
-		// 	depth: 2,
-		// 	tree: "id,displayName,building,duration,result,timestamp"
-		// });
 	}
 }
 
