@@ -8,7 +8,7 @@
 		"watch": "webpack --watch",
 		"serve": "concurrently \"npm run build\" \"npm run start\" ",
 		"serve:watch": "concurrently --kill-others \"npm run watch\" \"npm run start\" "
-  },
+	},
 	"dependencies": {
 		"async": "^2.1.4",
 		"body-parser": "~1.15.2",
@@ -16,12 +16,12 @@
 		"cookie-parser": "~1.4.3",
 		"debug": "~2.2.0",
 		"express": "~4.14.0",
-		"jade": "~1.11.0",
 		"jenkins": "^0.20.0",
 		"lodash": "^4.17.4",
 		"morgan": "~1.7.0",
 		"node-sass": "^4.1.1",
 		"node-sass-middleware": "0.9.8",
+		"pug": "^2.0.0-beta11",
 		"serve-favicon": "~2.3.0"
 	},
 	"devDependencies": {
