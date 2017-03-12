@@ -15,20 +15,21 @@ async function listBuilds(limit) {
 	if (typeof limit === 'undefined') {
 		limit = config.rootProjectsLimit;
 	}
+	let builds;
 
 	if (!isProd) {
 		let data = require('../mocks/builds.json');
-		let builds = handleBuilds(data.builds, limit);
-		return Promise.resolve(builds);
+		builds = handleBuilds(data.builds, limit);
 	} else {
 		let response = await jenkins.job.get(rootProjectName, {
 			depth: 1,
 			tree: "builds[id,displayName,description,number,building,duration,timestamp,result,url]"
 		});
-		let normalizedBuilds = handleBuilds(response.builds, limit)
+		builds = handleBuilds(response.builds, limit)
 			.map(build => Object.assign({}, build, { projectName: rootProjectName }));
-		return Promise.resolve(normalizedBuilds);
+
 	}
+	return builds;
 }
 
 function getDownstreamProjects(projectName, upstreamBuildNumber) {
@@ -43,27 +44,18 @@ function getDownstreamProjects(projectName, upstreamBuildNumber) {
 		return jenkins.job.get(projectName, {
 			tree: "downstreamProjects[name]"
 		})
-			.then(data => data.downstreamProjects.map(downstreamProject => downstreamProject.name))
+			.then(data => _.map(data.downstreamProjects, 'name'))
 			.then(downstreamProjects => {
 				let requestPromises = downstreamProjects.map(downstreamProject =>
 					jenkins.job.get(downstreamProject, {
 						depth: 1,
 						tree: 'name,builds[id,actions[causes[upstreamBuild,upstreamProject]]]'
+					}).then((data) => {
+						let foundBuild = findBuildByUpstreamBuildNumber(data.builds, upstreamBuildNumber);
+						return foundBuild
+							? { name: data.name, id: foundBuild.id }
+							: undefined
 					})
-						.then((data) => {
-							let foundBuild = _.find(data.builds, (build) =>
-								_.find(build.actions, (action) =>
-									_.find(action.causes, (cause) =>
-										cause !== undefined
-											? cause.upstreamBuild === upstreamBuildNumber
-											: false
-									)
-								)
-							);
-							return foundBuild
-								? { name: data.name, id: foundBuild.id }
-								: undefined
-						})
 				);
 				return Promise.all(requestPromises)
 					.then(builds => {
@@ -101,17 +93,31 @@ function getDownstreamProjects(projectName, upstreamBuildNumber) {
 					});
 			})
 			.then(builds => {
-				let buildsWithData =_.compact(_.flatten(builds));
+				let buildsWithData = flattenAndCompact(builds);
 				if (buildsWithData.length > 0) {
 					return Promise.all(buildsWithData.map(buildWithData =>
 						getDownstreamProjects(buildWithData.projectName, parseInt(buildWithData.id, 10))
-					))
-						.then(nextBuilds => _.flatten(_.concat(buildsWithData, nextBuilds)));
+					)).then(nextBuilds => concatAndFlatten(buildsWithData, nextBuilds));
 				} else {
 					return buildsWithData;
 				}
 			});
 	}
+}
+
+const flattenAndCompact = _.flow([_.flatten, _.compact]);
+const concatAndFlatten = _.flow([_.concat, _.flatten]);
+
+function findBuildByUpstreamBuildNumber(builds, upstreamBuildNumber) {
+	return _.find(builds, (build) =>
+		_.find(build.actions, (action) =>
+			_.find(action.causes, (cause) =>
+				cause !== undefined
+					? cause.upstreamBuild === upstreamBuildNumber
+					: false
+			)
+		)
+	);
 }
 
 function listJobsByBuild(buildNumber) {
