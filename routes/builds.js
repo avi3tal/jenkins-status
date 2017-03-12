@@ -25,8 +25,9 @@ router.get('/:id', async function(req, res, next) {
 
 router.get('/downstream/:jobName/:buildId', async function(req, res, next) {
 	try {
-		let buildId = parseInt(req.params['buildId'], 10);
-		let jobs = await jenkinsService.getDownstreamProjects(req.params['jobName'], buildId);
+		let { buildId, jobName } = req.params;
+		buildId = parseInt(buildId, 10);
+		let jobs = await jenkinsService.getDownstreamProjects(jobName, buildId);
 		res.send(jobs);
 	} catch (err) {
 		next(err);
