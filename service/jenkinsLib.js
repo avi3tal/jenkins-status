@@ -69,25 +69,14 @@ async function fetchDownstreamProjectsForBuild(downstreamProjects, upstreamBuild
 			tree: 'id,building,description,displayName,duration,result,timestamp,url,subBuilds[abort,jobName,result,buildNumber],actions[failCount,skipCount,totalCount,causes[upstreamBuild,upstreamProject],triggeredBuilds[*]]'
 		})
 			.then(build => {
-				let results = _.find(build.actions, { '_class': 'hudson.tasks.junit.TestResultAction' });
-				let causes = _.find(build.actions, { '_class': 'hudson.model.CauseAction' });
-				let parent = _.find(causes.causes, { '_class': 'hudson.model.Cause$UpstreamCause' });
-				let triggeredBuildsAction = _.find(build.actions, { '_class': 'hudson.plugins.parameterizedtrigger.BuildInfoExporterAction'});
-				console.log('projectName', projectName, build.id);
-				console.log('displayName', build.displayName);
-				let build_ = Object.assign({}, _.omit(build, 'actions'), {projectName: projectName, results: results, parent: parent});
+				let build_ = extendBuildInfo(build, projectName);
+				let triggeredBuildsAction = getTriggeredBuildAction(build);
 				if (triggeredBuildsAction && triggeredBuildsAction.triggeredBuilds.length > 0) {
 					return Promise.all(triggeredBuildsAction.triggeredBuilds.map(triggeredBuild => {
 						let projectName_ = _.trim(triggeredBuild.fullDisplayName.replace(triggeredBuild.displayName, ''));
 						return jenkins.build.get(projectName_, parseInt(triggeredBuild.id, 10), {
 							tree: 'id,building,description,displayName,duration,result,timestamp,url,subBuilds[abort,jobName,result,buildNumber],actions[failCount,skipCount,totalCount,causes[upstreamBuild,upstreamProject],triggeredBuilds[*]]'
-						})
-							.then((build) => {
-								let results = _.find(build.actions, { '_class': 'hudson.tasks.junit.TestResultAction' });
-								let causes = _.find(build.actions, { '_class': 'hudson.model.CauseAction' });
-								let parent = _.find(causes.causes, { '_class': 'hudson.model.Cause$UpstreamCause' });
-								return Object.assign({}, _.omit(build, 'actions'), {projectName: projectName_, results: results, parent: parent});
-							});
+						}).then((build) => extendBuildInfo(build, projectName_));
 					})).then((response) => _.flatten(_.concat([build_], response)));
 				}
 				return build_;
@@ -97,14 +86,26 @@ async function fetchDownstreamProjectsForBuild(downstreamProjects, upstreamBuild
 
 async function constructDownstreamBuilds(downstreamBuilds) {
 	let buildsWithData = flattenAndCompact(downstreamBuilds);
-	if (buildsWithData.length > 0) {
-		let nextBuilds = await Promise.all(buildsWithData.map(buildWithData =>
-			getDownstreamProjects(buildWithData.projectName, parseInt(buildWithData.id, 10))
-		));
-		return concatAndFlatten(buildsWithData, nextBuilds);
-	} else {
-		return buildsWithData;
-	}
+	let nextBuilds = await Promise.all(buildsWithData.map(buildWithData =>
+		getDownstreamProjects(buildWithData.projectName, parseInt(buildWithData.id, 10))
+	));
+	return concatAndFlatten(buildsWithData, nextBuilds);
+}
+
+function extendBuildInfo(build, projectName) {
+	let { results, parent } = getResultParent(build);
+	return Object.assign({}, _.omit(build, 'actions'), {projectName: projectName, results: results, parent: parent});
+}
+
+function getResultParent(build) {
+	let results = _.find(build.actions, { '_class': 'hudson.tasks.junit.TestResultAction' });
+	let causes = _.find(build.actions, { '_class': 'hudson.model.CauseAction' });
+	let parent = _.find(causes.causes, { '_class': 'hudson.model.Cause$UpstreamCause' });
+	return { results, parent };
+}
+
+function getTriggeredBuildAction(build) {
+	return _.find(build.actions, { '_class': 'hudson.plugins.parameterizedtrigger.BuildInfoExporterAction'});
 }
 
 function findBuildByUpstreamBuildNumber(builds, upstreamBuildNumber) {
